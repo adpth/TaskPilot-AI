@@ -1,0 +1,80 @@
+# ==========================================
+# TaskPilot AI - Security & Environment Ignored Files (.gitignore)
+# ==========================================
+
+# 1. Sensitive Local Context & AI Project Configurations
+context.md
+AGENTS.md
+CLAUDE.md
+npm-cache/
+skills-lock.json
+
+.agents/
+
+# 2. Environmental Secrets (Security Shields)
+# Prevent private credentials, API keys, and Supabase connections from leaking!
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test.local
+.env.production
+.env.production.local
+.env.staging
+.env.staging.local
+
+# 3. Python Backend Virtual Environments & Caching
+backend/venv/
+backend/.venv/
+backend/__pycache__/
+backend/app/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# 4. Local Database Engines & File Storage
+# Bypasses local SQLite engines to secure private test datasets from exposure
+backend/taskpilot.db
+backend/taskpilot.db-journal
+*.db
+*.sqlite
+*.sqlite3
+
+# 5. Node.js Frontend Dependencies & Builds
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+node_modules/
+.next/
+out/
+build/
+.pnp/
+.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+
+# 6. IDEs, OS Files & Sandbox System Logs
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.log
