@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "../../components/AuthProvider";
 import LoadingOverlay from "../../components/LoadingOverlay";
@@ -73,18 +73,13 @@ export default function SchedulePage() {
     return `${selectedProto}://${apiDomain}/users/${feedToken}/calendar.ics`;
   };
 
-  useEffect(() => {
-    fetchSchedule();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
-
-  const headers = (): Record<string, string> => {
+  const headers = useCallback((): Record<string, string> => {
     const h: Record<string, string> = { "Content-Type": "application/json" };
     if (token) h["Authorization"] = `Bearer ${token}`;
     return h;
-  };
+  }, [token]);
 
-  const fetchSchedule = async () => {
+  const fetchSchedule = useCallback(async () => {
     setInitialLoading(true);
     try {
       const res = await fetch(`${API_BASE}/schedule`, { headers: headers() });
@@ -94,7 +89,11 @@ export default function SchedulePage() {
     } finally {
       setInitialLoading(false);
     }
-  };
+  }, [headers]);
+
+  useEffect(() => {
+    fetchSchedule();
+  }, [fetchSchedule]);
 
   const simulateLoading = async (messages: string[]) => {
     setLoading(true);
@@ -211,8 +210,8 @@ export default function SchedulePage() {
       toast.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-400"></span> .ICS File Downloaded Successfully!`;
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 4000);
-    } catch (e: any) {
-      setError(`Failed to export local calendar: ${e.message}`);
+    } catch (e: unknown) {
+      setError(`Failed to export local calendar: ${e instanceof Error ? e.message : String(e)}`);
     }
   };
 

@@ -60,8 +60,8 @@ export default function CreateProjectModal({ open, onClose }: CreateProjectModal
       setDescription("");
       onClose();
       router.push(`/dashboard/projects/${data.id}`);
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }

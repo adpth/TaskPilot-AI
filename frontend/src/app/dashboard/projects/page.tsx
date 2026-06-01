@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../components/AuthProvider";
 import CreateProjectModal from "../../components/CreateProjectModal";
 import Link from "next/link";
@@ -33,18 +33,13 @@ export default function ProjectsPage() {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchProjects();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
-
-  const headers = (): Record<string, string> => {
+  const headers = useCallback((): Record<string, string> => {
     const h: Record<string, string> = {};
     if (token) h["Authorization"] = `Bearer ${token}`;
     return h;
-  };
+  }, [token]);
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/projects`, { headers: headers() });
@@ -53,7 +48,11 @@ export default function ProjectsPage() {
     finally {
       setLoading(false);
     }
-  };
+  }, [headers]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
 
   const handleDelete = async (id: number, e: React.MouseEvent) => {
     e.preventDefault();

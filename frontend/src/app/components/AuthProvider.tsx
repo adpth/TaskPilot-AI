@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
 
@@ -34,20 +34,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
 
-  // On mount, check for stored token and validate it
-  useEffect(() => {
-    const stored = localStorage.getItem("taskpilot_token");
-    if (stored) {
-      validateToken(stored);
-    } else {
-      setIsLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const validateToken = async (jwt: string) => {
+  const validateToken = useCallback(async (jwt: string) => {
     try {
       const res = await fetch(`${API_BASE}/auth/me`, {
         headers: { Authorization: `Bearer ${jwt}` },
@@ -73,7 +61,17 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // On mount, check for stored token and validate it
+  useEffect(() => {
+    const stored = localStorage.getItem("taskpilot_token");
+    if (stored) {
+      validateToken(stored);
+    } else {
+      setIsLoading(false);
+    }
+  }, [validateToken]);
 
   const login = useCallback(async (email: string, password: string) => {
     const res = await fetch(`${API_BASE}/auth/login`, {

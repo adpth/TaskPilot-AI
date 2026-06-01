@@ -39,8 +39,8 @@ export default function SignupPage() {
     setLoading(true);
     try {
       await signup(email, password, name);
-    } catch (err: any) {
-      setError(err.message || "Signup failed. Please try again.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "../../../components/AuthProvider";
 import Link from "next/link";
@@ -13,8 +13,6 @@ import {
   CheckCircle2,
   AlertCircle,
   HelpCircle,
-  Clock,
-  ChevronRight,
   Flame,
   Check,
 } from "lucide-react";
@@ -70,10 +68,37 @@ export default function FocusModePage() {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const headers = useCallback((): Record<string, string> => {
+    const h: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) h["Authorization"] = `Bearer ${token}`;
+    return h;
+  }, [token]);
+
+  const fetchTask = useCallback(async (isInitial = false) => {
+    try {
+      const res = await fetch(`${API_BASE}/tasks/${id}`, { headers: headers() });
+      if (res.ok) {
+        const taskData = await res.json() as TaskDetail;
+        setTask(taskData);
+        if (isInitial) {
+          const totalSecs = taskData.total_duration * 60;
+          setSecondsRemaining(totalSecs);
+          setInitialSeconds(totalSecs);
+        }
+        setError(null);
+      } else {
+        setError("This task was not found. Please verify the URL or try planning it first!");
+      }
+    } catch {
+      setError("Failed to fetch task information. Check your internet connection.");
+    } finally {
+      setLoading(false);
+    }
+  }, [id, headers]);
+
   useEffect(() => {
     fetchTask(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [fetchTask]);
 
   // Main dynamic timer ticking effect
   useEffect(() => {
@@ -101,34 +126,6 @@ export default function FocusModePage() {
     };
   }, [isActive, isOverrun]);
 
-  const headers = (): Record<string, string> => {
-    const h: Record<string, string> = { "Content-Type": "application/json" };
-    if (token) h["Authorization"] = `Bearer ${token}`;
-    return h;
-  };
-
-  const fetchTask = async (isInitial = false) => {
-    try {
-      const res = await fetch(`${API_BASE}/tasks/${id}`, { headers: headers() });
-      if (res.ok) {
-        const taskData = await res.json() as TaskDetail;
-        setTask(taskData);
-        if (isInitial) {
-          const totalSecs = taskData.total_duration * 60;
-          setSecondsRemaining(totalSecs);
-          setInitialSeconds(totalSecs);
-        }
-        setError(null);
-      } else {
-        setError("This task was not found. Please verify the URL or try planning it first!");
-      }
-    } catch {
-      setError("Failed to fetch task information. Check your internet connection.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleToggleStep = async (stepId: number) => {
     try {
       const res = await fetch(`${API_BASE}/steps/${stepId}/toggle`, {
@@ -151,7 +148,6 @@ export default function FocusModePage() {
   const handleSubmitTelemetry = async () => {
     if (!task) return;
 
-    const estimatedDuration = task.total_duration;
     // Calculated total minutes spent on this focus session
     const actualDurationMinutes = Math.round(
       (initialSeconds - secondsRemaining + overrunSeconds) / 60
@@ -190,7 +186,7 @@ export default function FocusModePage() {
       });
 
       if (res.ok) {
-        const data = await res.json();
+        await res.json();
         // Refresh local task steps
         await fetchTask();
         setShowBlockerModal(false);
@@ -571,7 +567,7 @@ export default function FocusModePage() {
               <div className="flex flex-col items-center gap-1 select-none">
                 <CheckCircle2 className="h-10 w-10 text-emerald-400 animate-pulse" />
                 <h3 className="text-base font-extrabold text-white mt-3">Workpiece Complete!</h3>
-                <p className="text-xs text-zinc-500 font-medium mt-1">Excellent focus work session. Let's record telemetry.</p>
+                <p className="text-xs text-zinc-500 font-medium mt-1">Excellent focus work session. Let&apos;s record telemetry.</p>
               </div>
 
               {/* Difficulty Star Selector (1-5) */}

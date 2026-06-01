@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../components/AuthProvider";
 import CreateProjectModal from "../components/CreateProjectModal";
 import Link from "next/link";
@@ -53,6 +53,33 @@ export default function DashboardOverview() {
     audit_recommendation: string;
   } | null>(null);
 
+  const fetchProjects = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/projects`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (res.ok) setProjects(await res.json());
+    } catch { }
+  }, [token]);
+
+  const fetchSchedule = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/schedule`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (res.ok) setSchedule(await res.json());
+    } catch { }
+  }, [token]);
+
+  const fetchWorkloadAudit = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/schedule/workload-audit`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (res.ok) setWorkloadAudit(await res.json());
+    } catch { }
+  }, [token]);
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -69,35 +96,7 @@ export default function DashboardOverview() {
       }
     };
     loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
-
-  const fetchProjects = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/projects`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      if (res.ok) setProjects(await res.json());
-    } catch { }
-  };
-
-  const fetchSchedule = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/schedule`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      if (res.ok) setSchedule(await res.json());
-    } catch { }
-  };
-
-  const fetchWorkloadAudit = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/schedule/workload-audit`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      if (res.ok) setWorkloadAudit(await res.json());
-    } catch { }
-  };
+  }, [fetchProjects, fetchSchedule, fetchWorkloadAudit]);
 
   const totalTasks = projects.reduce((acc, p) => acc + p.task_count, 0);
   const totalSteps = projects.reduce((acc, p) => acc + p.total_steps, 0);

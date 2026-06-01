@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams } from "next/navigation";
 import { useAuth } from "../../../components/AuthProvider";
 import Link from "next/link";
 import {
@@ -61,7 +61,6 @@ interface ManualStepInput {
 export default function ProjectDetailPage() {
   const { id } = useParams();
   const { token } = useAuth();
-  const router = useRouter();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [expandedTask, setExpandedTask] = useState<number | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
@@ -70,18 +69,13 @@ export default function ProjectDetailPage() {
   const [manualSteps, setManualSteps] = useState<ManualStepInput[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchProject();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  const headers = (): Record<string, string> => {
+  const headers = useCallback((): Record<string, string> => {
     const h: Record<string, string> = { "Content-Type": "application/json" };
     if (token) h["Authorization"] = `Bearer ${token}`;
     return h;
-  };
+  }, [token]);
 
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE}/projects/${id}`, { headers: headers() });
       if (res.ok) {
@@ -92,7 +86,11 @@ export default function ProjectDetailPage() {
     } catch {
       setError("Failed to load project");
     }
-  };
+  }, [id, headers]);
+
+  useEffect(() => {
+    fetchProject();
+  }, [fetchProject]);
 
   const handleToggleStep = async (stepId: number) => {
     try {
