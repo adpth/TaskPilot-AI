@@ -17,9 +17,7 @@ Instead of traditional, rigid calendar slots that break on the first delay, Task
 ## 🎥 Video Walkthrough
 
 <p align="center">
-  <video src="./assets/demo-video.mp4" width="100%" controls>
-    Your browser does not support the video tag.
-  </video>
+  <img src="./assets/demo-video.gif" width="100%" alt="TaskPilot AI Walkthrough" />
 </p>
 
 ---
@@ -212,6 +210,10 @@ Step through these production validation flows to experience TaskPilot AI's beha
 3. **Expected Result**: A custom Webcal feed overlay opens, exposing a private feed link structured as `webcal://127.0.0.1:8000/api/users/{feed_token}/calendar.ics`.
 4. Click **Subscribe Natively**.
 5. **Expected Result**: Your browser opens your computer's native default calendar application (Apple Calendar on Mac, Microsoft Outlook on Windows) instantly, prompting you to subscribe to the live TaskPilot AI schedule feed at $0 cost!
+
+<p align="center">
+  <img src="./assets/calendar-sync.gif" width="90%" alt="Webcal Calendar Subscription Demo" />
+</p>
 
 ### 🧪 Playbook 5: Interactive Focus Timeline Sidebar Delays
 1. Navigate to the **Schedule** timeline page (`/dashboard/schedule`).
