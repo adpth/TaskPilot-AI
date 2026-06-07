@@ -14,6 +14,16 @@ Instead of traditional, rigid calendar slots that break on the first delay, Task
 
 ---
 
+## 🎥 Video Walkthrough
+
+<p align="center">
+  <video src="./assets/demo-video.mp4" width="100%" controls>
+    Your browser does not support the video tag.
+  </video>
+</p>
+
+---
+
 ## 🎨 Key Features & Cognitive Architecture
 
 ### 1. Immersive Distraction-Free Focus Workspace
